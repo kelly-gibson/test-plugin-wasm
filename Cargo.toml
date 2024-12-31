@@ -1,0 +1,9 @@
+[package]
+name = "test-plugin-wasm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0.217", features = ["derive"] }
+surrealdb = { version = "2.1.4", features = ["kv-mem"] }
+tokio = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }
