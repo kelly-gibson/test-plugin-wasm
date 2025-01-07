@@ -1,73 +1,36 @@
-use serde::{Deserialize, Serialize};
-use surrealdb::RecordId;
+mod inference_handler;
+
+use std::error::Error;
+use surrealdb::engine::local::Mem;
+use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
 
-// For an in memory database
-use surrealdb::engine::local::Mem;
-
-#[derive(Debug, Serialize)]
-struct Name<'a> {
-    first: &'a str,
-    last: &'a str,
-}
-
-#[derive(Debug, Serialize)]
-struct Person<'a> {
-    title: &'a str,
-    name: Name<'a>,
-    marketing: bool,
-}
-
-#[derive(Debug, Serialize)]
-struct Responsibility {
-    marketing: bool,
-}
-
-#[derive(Debug, Deserialize)]
-struct Record {
-    #[allow(dead_code)]
-    id: RecordId,
-}
+// Import the async inference function from your inference_handler module
+use inference_handler::inference_handler;
 
 #[tokio::main]
-async fn main() -> surrealdb::Result<()> {
-    // Create database connection in memory
+async fn main() -> Result<(), Box<dyn Error>> {
+    // 1. Initialize SurrealDB with an ephemeral local storage engine:
+    //    Using () as the endpoint creates an in-memory DB (no file).
     let db = Surreal::new::<Mem>(()).await?;
-    
-    // Select a specific namespace / database
+
+    // Optional sign-in (depends on your SurrealDB config)
+    db.signin(Root {
+        username: "root",
+        password: "root",
+    }).await?;
+
+    // Select namespace and database
     db.use_ns("test").use_db("test").await?;
 
-    // Create a new person with a random id
-    let created: Option<Record> = db
-        .create("person")
-        .content(Person {
-            title: "Founder & CEO",
-            name: Name {
-                first: "Tobie",
-                last: "Morgan Hitchcock",
-            },
-            marketing: true,
-        })
-        .await?;
-    dbg!(created);
+    // 2. Simulate a string input from Whisper
+    let whisper_input = "Open the door quietly";
 
-    // Update a person record with a specific id
-    let updated: Option<Record> = db
-        .update(("person", "jaime"))
-        .merge(Responsibility { marketing: true })
-        .await?;
-    dbg!(updated);
+    // 3. Run inference and get the JSON-like response
+    let result_json = inference_handler(&db, whisper_input).await?;
 
-    // Select all people records
-    let people: Vec<Record> = db.select("person").await?;
-    dbg!(people);
-
-    // Perform a custom advanced query
-    let groups = db
-        .query("SELECT marketing, count() FROM type::table($table) GROUP BY marketing")
-        .bind(("table", "person"))
-        .await?;
-    dbg!(groups);
+    // 4. Output the resulting JSON to stdout (to be piped to Unreal Engine)
+    println!("{}", result_json);
 
     Ok(())
 }
