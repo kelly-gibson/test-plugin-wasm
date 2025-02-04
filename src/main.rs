@@ -14,17 +14,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //    Using () as the endpoint creates an in-memory DB (no file).
     let db = Surreal::new::<Mem>(()).await?;
 
-    // Optional sign-in (depends on your SurrealDB config)
-    db.signin(Root {
-        username: "root",
-        password: "root",
-    }).await?;
-
     // Select namespace and database
     db.use_ns("test").use_db("test").await?;
 
     // 2. Simulate a string input from Whisper
-    let whisper_input = "Open the door quietly";
+    let whisper_input = "Open the door";
 
     // 3. Run inference and get the JSON-like response
     let result_json = inference_handler(&db, whisper_input).await?;
