@@ -11,6 +11,10 @@ The plugin uses an embedded ONNX runtime to load and execute ONNX models from wi
 ## Usage
 
 ```
+1. Place your ONNX model in the models folder.
+2. run `cargo run`.
+
+NOTE: Only test functionality is available. Inference will be run on the whisper_input string located in main.rs:21.
 ```
 
 ## Components
@@ -19,15 +23,15 @@ The plugin uses an embedded ONNX runtime to load and execute ONNX models from wi
 ## TODO
 ### Inference
  - [x] Implement basic inference handler.
- - [ ] Implement model loading and inference from within ue5 project.
- - [ ] Implement whisper model for STT functionality.
+ - [] Implement model loading and inference from within ue5 project.
+ - [] Implement whisper model for STT functionality.
 ### Database
- - [ ] Implement db handler.
- - [ ] Implement Vision Cone Filter logic to identify visible objects and geometry within the NPC's field of view.
- - [ ] Collect and serialize scene and object data for database storage.
- - [ ] Connect Vision Cone Filter to SurrealDB for runtime updates.
+ - [x] Implement db handler.
+ - [] Implement Vision Cone Filter logic to identify visible objects and geometry within the NPC's field of view.
+ - [] Collect and serialize scene and object data for database storage.
+ - [] Connect Vision Cone Filter to SurrealDB for runtime updates.
  ### Engine Integration
- - [ ] Create UE5 Blueprints for common NPC actions (e.g., animations, object interaction).
+ - [] Create UE5 Blueprints for common NPC actions (e.g., animations, object interaction).
  
 ## Contributing
 
