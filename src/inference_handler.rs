@@ -1,5 +1,3 @@
-use surrealdb::engine::local::Db;
-use surrealdb::Surreal;
 use surrealml_core::storage::surml_file::SurMlFile;
 use surrealml_core::execution::compute::ModelComputation;
 
@@ -8,12 +6,12 @@ use serde_json::json;
 use std::error::Error;
 
 // Pseudo-code for fetching environment data from SurrealDB
-async fn fetch_scene_context(_db: &Surreal<Db>) -> Result<String, Box<dyn Error>> {
+async fn fetch_scene_context() -> Result<String, Box<dyn Error>> {
     // Example:
     // let query_result = db.query("SELECT * FROM environment;").await?;
     // let environment_data = query_result.take::<Vec<EnvironmentRecord>>(0)?;
     //
-    // For demonstration, just return a static JSON:
+    // For demonstration, lets just return a static JSON for now:
     let dummy_json = json!({
         "meshes": ["Wall", "Floor"],
         "objects": ["Key", "Door"]
@@ -26,17 +24,16 @@ async fn fetch_scene_context(_db: &Surreal<Db>) -> Result<String, Box<dyn Error>
 /// 2. Loads and runs a SurML model.
 /// 3. Returns the output as a JSON string.
 pub async fn inference_handler(
-    db: &Surreal<Db>,
     instruction: &str
 ) -> Result<String, Box<dyn Error>> {
     // 1) Query SurrealDB for scene context (async).
-    let scene_context = fetch_scene_context(db).await?;
+    let scene_context = fetch_scene_context().await?;
 
     // 2) Combine user instruction + scene context into one string.
     let combined_input = format!("Instruction: {}\nScene: {}", instruction, scene_context);
 
     // 3) Load the SurML file.
-    let mut file = SurMlFile::from_file("./test.surml")
+    let mut file = SurMlFile::from_file("./stash/test.surml")
         .map_err(|e| format!("Failed to load SurML file: {}", e))?;
 
     // 4) Create a compute unit for the model.
